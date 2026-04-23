@@ -1,19 +1,23 @@
-{pkgs, ...}: {
-  devShells.dev = pkgs.mkShellNoCC {
-    name = "beepboop-dev";
+# Development shell for beepboop
+{
+  pkgs,
+  inputs,
+  system,
+}:
+pkgs.mkShellNoCC {
+  name = "beepboop-dev";
 
-    buildInputs = with pkgs; [
-      # Development tools
-      git
+  buildInputs = with pkgs; [
+    # Development tools
+    git
 
-      # Formatting
-      alejandra
+    # Formatting
+    alejandra
 
-      # Add development-specific tools here
-    ];
+    # Add development-specific tools here
+  ];
 
-    shellHook = ''
-      echo "Development environment loaded"
-    '';
-  };
+  shellHook = ''
+    echo "beepboop development shell"
+  '';
 }

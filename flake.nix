@@ -23,12 +23,22 @@
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin"];
 
-      perSystem = {pkgs, ...}: {
-        # Development shell
-        devShells.default = pkgs.mkShell {
-          # buildInputs = with pkgs; [
-          #   # Add your dependencies here
-          # ];
+      perSystem = {
+        pkgs,
+        system,
+        ...
+      }: {
+        # Development shells
+        devShells = {
+          # Regular shell for development
+          default = import ./nix/dev.nix {
+            inherit inputs pkgs system;
+          };
+
+          # Classic shell for CI
+          ci = import ./nix/ci.nix {
+            inherit pkgs inputs system;
+          };
         };
 
         # Packages
