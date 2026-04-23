@@ -1,5 +1,5 @@
 {
-  description = "beepboop";
+  description = "A test harness framework for orchestrating and validating complex system behavior";
 
   inputs = {
     base-nixpkgs.url = "github:ck3mp3r/flakes?dir=base-nixpkgs";
@@ -19,35 +19,99 @@
     };
   };
 
-  outputs = inputs @ {flake-parts, ...}:
+  outputs = inputs @ {
+    self,
+    flake-parts,
+    ...
+  }:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = ["x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin"];
+      systems = ["aarch64-darwin" "aarch64-linux" "x86_64-linux"];
+      perSystem = {
+        config,
+        system,
+        ...
+      }: let
+        supportedTargets = ["aarch64-darwin" "aarch64-linux" "x86_64-linux"];
+        overlays = [
+          inputs.fenix.overlays.default
+          inputs.base-nixpkgs.overlays.default
+        ];
+        pkgs = import inputs.nixpkgs {inherit system overlays;};
 
-      perSystem = {pkgs, ...}: {
-        # Development shell
-        devShells.default = pkgs.mkShell {
-          # buildInputs = with pkgs; [
-          #   # Add your dependencies here
-          # ];
+        cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
+        cargoLock = {lockFile = ./Cargo.lock;};
+
+        # Install data for pre-built releases
+        installData = {
+          aarch64-darwin = builtins.fromJSON (builtins.readFile ./data/aarch64-darwin.json);
+          aarch64-linux = builtins.fromJSON (builtins.readFile ./data/aarch64-linux.json);
+          x86_64-linux = builtins.fromJSON (builtins.readFile ./data/x86_64-linux.json);
         };
 
-        # Packages
-        packages.default = pkgs.stdenv.mkDerivation {
-          name = "beepboop";
+        # Build regular packages
+        regularPackages = inputs.rustnix.lib.rust.buildTargetOutputs {
+          inherit
+            cargoToml
+            cargoLock
+            overlays
+            pkgs
+            system
+            installData
+            supportedTargets
+            ;
+          fenix = inputs.fenix;
+          nixpkgs = inputs.nixpkgs;
           src = ./.;
-
-          buildPhase = ''
-            # Add build commands here
-          '';
-
-          installPhase = ''
-            mkdir -p $out/bin
-            # Add install commands here
-          '';
+          packageName = "beepboop";
+          archiveAndHash = false;
         };
 
-        # Formatter
+        # Build archive packages (creates archive with system name)
+        archivePackages = inputs.rustnix.lib.rust.buildTargetOutputs {
+          inherit
+            cargoToml
+            cargoLock
+            overlays
+            pkgs
+            system
+            installData
+            supportedTargets
+            ;
+          fenix = inputs.fenix;
+          nixpkgs = inputs.nixpkgs;
+          src = ./.;
+          packageName = "archive";
+          archiveAndHash = true;
+        };
+      in {
+        apps = {
+          default = {
+            type = "app";
+            program = "${config.packages.default}/bin/beepboop";
+          };
+        };
+
+        packages = regularPackages // archivePackages;
+
+        devShells = {
+          # Regular shell for development
+          default = import ./nix/dev.nix {
+            inherit inputs pkgs system;
+          };
+
+          # Classic shell for CI
+          ci = import ./nix/ci.nix {
+            inherit pkgs inputs system;
+          };
+        };
+
         formatter = pkgs.alejandra;
+      };
+
+      flake = {
+        overlays.default = final: prev: {
+          beepboop = self.packages.${prev.system}.default;
+        };
       };
     };
 }
