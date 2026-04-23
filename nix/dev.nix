@@ -3,21 +3,39 @@
   pkgs,
   inputs,
   system,
-}:
-pkgs.mkShellNoCC {
-  name = "beepboop-dev";
+}: let
+  fenix = inputs.fenix.packages.${system};
 
-  buildInputs = with pkgs; [
-    # Development tools
-    git
+  # Development helper scripts
+  check = pkgs.writeShellScriptBin "check" ''cargo check'';
+  fmt = pkgs.writeShellScriptBin "fmt" ''cargo fmt'';
+  tests = pkgs.writeShellScriptBin "tests" ''cargo test'';
+  clippy = pkgs.writeShellScriptBin "clippy" ''cargo clippy'';
+  build = pkgs.writeShellScriptBin "build" ''cargo build --release'';
+in
+  pkgs.mkShellNoCC {
+    name = "beepboop-dev";
 
-    # Formatting
-    alejandra
+    buildInputs = [
+      fenix.stable.toolchain
 
-    # Add development-specific tools here
-  ];
+      # Development scripts
+      check
+      fmt
+      tests
+      clippy
+      build
+    ];
 
-  shellHook = ''
-    echo "beepboop development shell"
-  '';
-}
+    shellHook = ''
+      echo "beepboop development shell"
+      echo "Rust: $(rustc --version)"
+      echo ""
+      echo "Available commands:"
+      echo "  check   - Run cargo check"
+      echo "  fmt     - Run cargo fmt"
+      echo "  tests   - Run cargo test"
+      echo "  clippy  - Run cargo clippy"
+      echo "  build   - Build release binary"
+    '';
+  }

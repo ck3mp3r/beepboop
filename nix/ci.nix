@@ -3,21 +3,19 @@
   pkgs,
   inputs,
   system,
-}:
-pkgs.mkShellNoCC {
-  name = "beepboop-ci";
+}: let
+  fenix = inputs.fenix.packages.${system};
+in
+  pkgs.mkShellNoCC {
+    name = "beepboop-ci";
 
-  buildInputs = with pkgs; [
-    # CI/CD tools
-    git
+    buildInputs = [
+      # Rust toolchain (stable)
+      fenix.stable.toolchain
+    ];
 
-    # Formatting
-    alejandra
-
-    # Add CI-specific tools here
-  ];
-
-  shellHook = ''
-    echo "beepboop CI environment"
-  '';
-}
+    shellHook = ''
+      echo "CI Testing Environment"
+      echo "Rust: $(rustc --version)"
+    '';
+  }

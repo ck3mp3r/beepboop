@@ -7,6 +7,9 @@ on:
       - main
     paths:
       - "**/*.nix"
+      - "**/*.rs"
+      - "Cargo.toml"
+      - "Cargo.lock"
       - "flake.lock"
       - "flake.nix"
 jobs:
@@ -18,6 +21,21 @@ jobs:
 
       - name: Install Determinate Nix
         uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Check Nix flake
+        run: nix flake check
+
+      - name: Cargo check
+        run: nix develop .#ci --command cargo check
+
+      - name: Cargo clippy
+        run: nix develop .#ci --command cargo clippy -- -D warnings
+
+      - name: Cargo format check
+        run: nix develop .#ci --command cargo fmt --check
+
+      - name: Cargo test
+        run: nix develop .#ci --command cargo test
 
       - name: Build beepboop via Nix
         run: nix build .#default

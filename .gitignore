@@ -51,7 +51,7 @@ __pycache__/
 result
 result-*
 
-# Rust (if used in future)
+# Rust
 target/
 Cargo.lock.msrv
 
