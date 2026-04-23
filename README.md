@@ -1,17 +1,20 @@
 # beepboop
 
-A test harness framework for orchestrating and validating system behavior.
+A fully-fledged AI agent harness built with Rust, rig.rs, and SurrealDB.
 
 ## Overview
 
-beepboop is a harness designed to facilitate automated testing and validation of complex systems. It provides a structured approach to test orchestration, execution, and result validation.
+beepboop is a complete AI interaction framework featuring an orchestrator/sub-agent architecture, tool calling capabilities, MCP integration, responsive TUI, and persistent session management. Think pi, opencode, or crush - but built with modern Rust tooling.
 
 ## Features
 
-- **Test Orchestration**: Coordinate multiple test components and dependencies
-- **Flexible Configuration**: Define test scenarios through declarative configuration
-- **Automated Validation**: Built-in assertion and validation mechanisms
-- **Extensible Architecture**: Plugin-based design for custom test implementations
+- **Orchestrator/Sub-Agent Architecture**: Hierarchical agent system with specialized sub-agents (Executor, Validator, Reporter, Chat)
+- **LLM Integration**: Unified provider interface via rig.rs supporting GitHub Copilot and 20+ LLM providers
+- **Tool Calling**: Native JSON schema-based tool calling with multi-turn conversations
+- **MCP Integration**: Built-in MCP server support for extensible tooling
+- **Responsive TUI**: Adaptive terminal interface built with ratatui
+- **Session Management**: Persistent sessions with SurrealDB, including vector support for future RAG capabilities
+- **SOLID Architecture**: Trait-based design with no dynamic dispatch, following TDD principles
 
 ## Quick Start
 

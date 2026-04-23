@@ -1,8 +1,8 @@
 [package]
 name = "beepboop"
 version = "0.1.0"
-description = "A test harness framework for orchestrating and validating complex system behavior"
-edition = "2021"
+description = "A fully-fledged AI agent harness with rig.rs, SurrealDB, and responsive TUI"
+edition = "2024"
 
 [dependencies]
 anyhow = "1.0.102"

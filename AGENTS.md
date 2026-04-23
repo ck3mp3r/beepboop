@@ -4,12 +4,15 @@ This document provides guidance for AI assistants working on the beepboop projec
 
 ## Project Overview
 
-beepboop is a test harness framework designed for orchestrating and validating complex system behavior. The project is in its initial setup phase.
+beepboop is a fully-fledged AI agent harness built with Rust, rig.rs, and SurrealDB. Think pi/opencode/crush - a complete AI interaction framework with orchestrator/sub-agent architecture, tool calling, MCP integration, responsive TUI, and session management. The project is in its initial setup phase.
 
 ## Technology Stack
 
 - **Build System**: Nix with flakes
-- **Language**: TBD (likely Rust based on flake structure)
+- **Language**: Rust 2024 edition
+- **LLM Framework**: rig-core 0.35.0
+- **TUI**: ratatui 0.30
+- **Database**: SurrealDB (embedded mode with vector support)
 - **CI/CD**: GitHub Actions
 
 ## Development Workflow
@@ -30,9 +33,10 @@ beepboop is a test harness framework designed for orchestrating and validating c
 
 ### Testing
 
-- Run `nix flake check` to validate the flake structure
 - Run `nix build` to test the build
 - When code is added, follow TDD principles (RED → GREEN → REFACTOR)
+- MANDATORY: Write tests BEFORE implementation
+- NO dynamic dispatch - use generics and static dispatch only
 
 ## Project Structure
 
@@ -102,7 +106,16 @@ nix fmt
 
 ## Architecture Decisions
 
-As the project evolves, document significant architectural decisions here.
+### Core Decisions
+
+1. **LLM Framework**: rig-core 0.35.0 for unified provider interface and tool calling
+2. **Database**: SurrealDB (embedded) for session management with vector support
+3. **Agent System**: Orchestrator → Sub-agent hierarchy (Executor, Validator, Reporter, Chat)
+4. **No Dynamic Dispatch**: All trait-based design using generics and static dispatch
+5. **TDD Mandatory**: RED → GREEN → REFACTOR for all code
+6. **SOLID Principles**: Applied rigorously throughout
+
+See c5t notes (project: 63261c99) for comprehensive architecture documentation.
 
 ## Getting Help
 
